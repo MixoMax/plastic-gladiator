@@ -1,6 +1,6 @@
 import os
 
-#%% Rahmeninfos ----------------------------------------------------------------
+#%% Development information
 __author__ = "palo.niemann@t-online.de"
 __version__ = "1.1.0"
 __CIO__ = "Yannick Braune"
@@ -14,11 +14,12 @@ __graphics__ = "..."
 __quality_assurance__ = "Linus Horn (linus@linushorn.dev)"
 EXPORT_VARS = [__author__, __version__, __CIO__, __moderators__, __team__, __head__, __supervisor__, __sound__, __concept__, __graphics__, __quality_assurance__]
 
-#Konstante, in Form eines Paths, der zum Arbeitsverzeichnis führt
+#%% Game configuration
+
+# set working directory to the root of the project
 os.chdir(os.path.dirname(os.path.abspath(__file__)) + "/..")
 WORKING_DIR = os.getcwd()
-#Konstante, in Form eines Paths, der zum Source Code führt
-#CURRENT_DIR = os.path.curdir()
+
 
 #Framemode
 Iwidth, Iheight = 1280, 720

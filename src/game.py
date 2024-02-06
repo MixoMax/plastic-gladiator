@@ -1,6 +1,5 @@
-#%% Imports ----------------------------------------------------------------
+# %% Imports ----------------------------------------------------------------
 import pygame
-import psutil
 
 import sys
 import os
@@ -13,12 +12,12 @@ from modules.g_image import GImage
 
 from functions.draw_performance_data import draw_p_data
 
-from screens.settings_screen import SettingsScreen
-from screens.book_screen import BookScreen
+from screens.settings_screen import SettingsScreen # noqa unused import for future use
+from screens.book_screen import BookScreen # noqa unused import for future use
 
-from config import *
+from config import Iwidth, Iheight, FONT_SIZE, WORKING_DIR, STAGE
 
-#%% Class ------------------------------------------------------------------
+# %% Class ------------------------------------------------------------------
 class Game:
 
     def __init__(self) -> None:
@@ -34,42 +33,42 @@ class Game:
             
             return val
 
-        #Pygame Window -----------------------------------------------------------------------------------------------------
+        # Pygame Window -----------------------------------------------------------------------------------------------------
         global monitor_size
         monitor_size = (pygame.display.Info().current_w, pygame.display.Info().current_h)
         self.fullscreen = False
         self.screen = pygame.display.set_mode((Iwidth, Iheight), pygame.RESIZABLE)
-        pygame.display.set_caption('Plastic Gladiator')
-        pygame.display.set_icon(pygame.image.load(os.path.join(WORKING_DIR, 'assets', 'images', 'Mülleimer.png')))
+        pygame.display.set_caption("Plastic Gladiator")
+        pygame.display.set_icon(pygame.image.load(os.path.join(WORKING_DIR, "assets", "images", "Mülleimer.png")))
 
-        #Game Variables ----------------------------------------------------------------------------------------------------
-        #variables that should be saved for the next opening
-        self.progress = _try_load_from_json(os.path.join(WORKING_DIR, 'assets', 'GameState.json'), 'progress', 0)
+        # Game Variables ----------------------------------------------------------------------------------------------------
+        # variables that should be saved for the next opening
+        self.progress = _try_load_from_json(os.path.join(WORKING_DIR, "assets", "GameState.json"), "progress", 0)
 
-        #update screen with data
+        # update screen with data
         self.font_size = FONT_SIZE
         self.toggle_data = False
 
-        #transitions
+        # transitions
         self.black_transition = (False, None)
         self.transition_player_info = [None, None, None, None]
         self.tmp_ticker_start = 0
 
-        #pop-up screens
+        # pop-up screens
         self.home_buttons_pressable = True
         self.show_settings = False
         self.show_book = False
         
-        #Pygame Logik ------------------------------------------------------------------------------------------------------
+        # Pygame Logic ------------------------------------------------------------------------------------------------------
         self.clock = pygame.time.Clock()
         self.font = pygame.font.Font(None, self.font_size)
 
-        #Sprite Groups -----------------------------------------------------------------------------------------------------
+        # Sprite Groups -----------------------------------------------------------------------------------------------------
         self.home_sprites = pygame.sprite.Group()
         self.walk_into_edeka = pygame.sprite.Group()
         self.edeka_1 = pygame.sprite.Group()
 
-        #Image Objects for each stage
+        # Image Objects for each stage
         self.home_background = GImage(0, 0, Iwidth, Iheight, (15, 34, 65))
         self.player = Player(Iwidth//2 - Iwidth//12, int(Iheight * 0.333), Iwidth//6, Iheight//2, (208, 157, 95))
         self.titel_name = GImage(Iwidth//2 - int(Iwidth*0.2), int(Iheight*0.02), int(Iwidth*0.4), int(Iheight*0.25), (123, 65, 235))
@@ -114,16 +113,16 @@ class Game:
 
         for event in pygame.event.get():
             
-            #before quiting the game, save all important variables
+            # before quiting the game, save all important variables
             if event.type == pygame.QUIT:
-                #first save all the game state
+                # first save all the game state
                 with open(os.path.join(WORKING_DIR, "JSONs", "GameState.json"), "w") as f:
                     data = {
                         "progress": self.progress,
                     }
                     json.dump(data, f, indent=4)
 
-                #then quit the game
+                # then quit the game
                 pygame.quit()
                 sys.exit()
 
@@ -163,9 +162,9 @@ class Game:
         # handle stage changes for different stages
         if STAGE == "walk_into_edeka":
 
-            wait_before_transition = 1100 #in Milliseconds 
+            wait_before_transition = 1100 # in Milliseconds 
             
-            #come back to home
+            # come back to home
             if self.player.x <= -self.player.width:
                 if not self.black_transition[0]:
                     if self.tmp_ticker_start == 0:
@@ -177,7 +176,7 @@ class Game:
                         self.buttons_not_pressable = True
                         self.transition_player_info = [Iwidth//2 - Iwidth//12, int(Iheight * 0.333), Iwidth//6, Iheight//2]
             
-            #Open the doors to go into edeka
+            # Open the doors to go into edeka
             if int(Iwidth*0.6 - Iwidth//15) <= self.player.x <= int(Iwidth*0.8) + self.door_R.width:
                 if self.door_L.x - 2 >= int(Iwidth*0.55):
                     self.door_L.x -= 2
@@ -211,10 +210,10 @@ class Game:
             self.handle_events()
             self.screen.fill((255, 255, 255))
 
-            #update the the width and height for scaling
+            # update the the width and height for scaling
             self.update_wh()
             
-            #update and draw objects for each stage
+            # update and draw objects for each stage
             if STAGE == "home":
                 self.home_sprites.update(Iwidth, Iheight, Cwidth, Cheight, stage=STAGE)
                 self.home_sprites.draw(self.screen)
@@ -225,17 +224,17 @@ class Game:
                 self.edeka_1.update(Iwidth, Iheight, Cwidth, Cheight, stage=STAGE)
                 self.edeka_1.draw(self.screen)
 
-            #handle pop-up menues
+            # handle pop-up menues
             if self.show_settings:
                 pass
             elif self.show_book:
                 pass
 
-            #handle transitions
+            # handle transitions
             if self.black_transition[0]:
                 self.transition_black(pygame.time.get_ticks(), self.tmp_ticker_start, self.black_transition[1], self.transition_player_info)
 
-            #do everything ontop of the game then end the frame
+            # do everything ontop of the game then end the frame
             draw_p_data(self, Cwidth)
             pygame.display.flip()
 
@@ -243,12 +242,17 @@ class Game:
 
         pygame.quit()
 
-    #transitions ------------------------------------------------------------------------------------------------------------------------------
+    # transitions ------------------------------------------------------------------------------------------------------------------------------
     def transition_black(self, ticker, start, stage, player_info) -> None:
         global STAGE
         self.movement = False
-        duration_ms = 2000 # in milliseconds
-        Opacity = min(((math.e/(duration_ms*100))+1)**(-((ticker-(start+duration_ms//2))**2)), 1.0)*255
+        duration_ms = 2000 # 2 seconds
+        
+        # quadratic function to make the opacity change smoother
+        Opacity = ((math.e/(duration_ms*100))+1)**(-((ticker-(start+duration_ms//2))**2))
+        
+        # make sure that the opacity is never greater than 255
+        Opacity = 255 if Opacity > 255 else Opacity
 
         semi_black_surface = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA)
         semi_black_surface.fill((0, 0, 0, Opacity))

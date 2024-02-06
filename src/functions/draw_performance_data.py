@@ -1,7 +1,7 @@
 import psutil
 import pygame
 
-from config import *
+from config import Cwidth, FONT_SIZE, EXPORT_VARS
 
 def draw_p_data(self, screen_width):
         line_spacing = FONT_SIZE
@@ -30,12 +30,12 @@ def draw_p_data(self, screen_width):
                 if idx == 9:
                      extra_spacing += 1
 
-            #team ----------------------------------------------------------------------------------------------------------
+            # team ----------------------------------------------------------------------------------------------------------
             names = EXPORT_VARS[4].split(", ")
             lines = []
             current_line = ""
 
-            #separate words and build different lines
+            # separate words and build different lines
             for name in names:
                 test_line = current_line + name + ", "
                 text_width, text_height = self.font.size(test_line)
@@ -49,7 +49,7 @@ def draw_p_data(self, screen_width):
             lines.append(current_line.rstrip())
             lines[0] = "Team: " + lines[0]
 
-            #draw different lines to the surface
+            # draw different lines to the surface
             y = 10
             for idx, line in enumerate(lines):
                 line_team_text = self.font.render(line, True, (255, 255, 255))
